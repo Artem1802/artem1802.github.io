@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+
+<head>
+    <style>
+        body {
+            display: flex;
+        }
+
+        .table td:nth-child(3) {
+            -webkit-line-clamp: 2;
+            margin: 0;
+            /* Убираем внешний отступ */
+            -webkit-line-clamp: 2;
+            /* Число отображаемых строк */
+            display: -webkit-box;
+            /* Включаем флексбоксы */
+            -webkit-box-orient: vertical;
+            /* Вертикальная ориентация */
+            overflow: hidden;
+            /* Обрезаем всё за пределами блока */
+        }
+
+        .table {
+            width: calc(50vw);
+            margin-right: 15px;
+        }
+
+        .edit-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pagination {
+            display: flex;
+        }
+
+        .pagination .active {
+            border: 1px solid red;
+        }
+
+        .pagination div {
+            margin-left: 10px;
+            padding: 10px;
+            background-color: bisque;
+            border-radius: 10%;
+            border: 1px solid black;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <button onclick="toggleColVisibility(0)">Показать / скрыть 1 столбец</button>
+        <button onclick="toggleColVisibility(1)">Показать / скрыть 2 столбец</button>
+        <button onclick="toggleColVisibility(2)">Показать / скрыть 3 столбец</button>
+        <button onclick="toggleColVisibility(3)">Показать / скрыть 4 столбец</button>
+        <div class="pagination" id="pagination"></div>
+        <table class="table" id="data-table"></table>
+    </div>
+    <div style="display: none">
+        <form class="edit-form" id="edit-form">
+            <label>Имя</label>
+            <input name="firstName" type="text" />
+            <label>Фамилия</label>
+            <input name="lastName" type="text" />
+            <label>Описание</label>
+            <input name="about" type="text" />
+            <label>Цвет глаз</label>
+            <input name="eyeColor" type="text" />
+            <button type="submit">Сохранить</button>
+            <input type="button" onclick="hideForm()" value="Отмена">
+        </form>
+    </div>
+    <script src="table/table.js"></script>
+    <script src="table/colDefs.js"></script>
+    <script src="table/pagination.js"></script>
+    <script src="./data.js"></script>
+    <script src="form/form.js"></script>
+    <script>
+        const pagination = new Pagination('pagination', 10)
+        const table = new Table("data-table", colDefs)
+        let data = [];
+
+        table.setOnEdit(onEditRowData)
+        bindOnSubmitToForm(table)
+
+        function renderTable(page, pageSize) {
+            const skip = (page - 1) * pageSize;
+            const slicedData = data.slice(skip, skip + pageSize)
+            table.setRowsData(slicedData);
+            table.render();
+            hideForm();
+        }
+
+        function init(data) {
+            pagination.setOnPageChange(renderTable)
+            pagination.setPage(1)
+            pagination.setTotal(data.length)
+            pagination.render();
+        }
+
+        function toggleColVisibility(colIndex) {
+            table.toggleColVisibility(colIndex)
+        }
+
+        //fetch('data.json').then(response => response.json()).then(data => init(data.JSON))
+        data = dataset.JSON;
+        init(data)
+    </script>
+</body>
+
+</html>
